@@ -5,7 +5,7 @@ On chain ETH trading strategy agent deployed on starknet mainnet | Built using G
 ## Table of Contents
 
 1. [All Links](#links)
-2. [Instructions to setup ](#instructions-to-setup)
+2. [Instructions to Run ](#instructions-to-run)
 3. [Project Overview](#project-overview)
 4. [Tech Stack](#tech-stack)
 5. [App Demo](#app-demo-screenshots)
@@ -16,29 +16,40 @@ On chain ETH trading strategy agent deployed on starknet mainnet | Built using G
 - [Demo Video]()
 - [Presentation]()
 
-## Instructions to Setup
+## Instructions to Run
 
 Follow these instructions to set up and run the project:
 
-- Clone the Git repository: ``
-- Install project dependencies: ``
+- Clone the Git repository: `https://github.com/0xAlphaDevs/starknet-eth-trading-agent`
+- Install project dependencies: `pip install -r requirements.txt`
+-
 
 ## Project Overview
 
 ### Agent Business Case
 
+The agent is designed to facilitate trading on the ETH/USDC pool using an AI-driven strategy. The goal is to optimize trades based on market conditions, leveraging machine learning models for prediction and decision-making.
+
 ### Functionality
+
+Automated Trading: Executes buy and sell orders in the ETH/USDC pool.
+Prediction Models: Uses trained models to predict optimal trading times and amounts.
+On-Chain Deployment: Deployed on Starknet mainnet, ensuring transparency and immutability.
 
 ### Attack Vectors
 
 ### Possible Improvements
 
+- **Model Enhancement** : Continuous training with updated data to improve prediction accuracy.
+- **User Interface** : Development of a user-friendly dashboard for monitoring and control.
+- **Integration with More DEXs** : Expanding support to other decentralized exchanges for diversified trading opportunities.
+
 ## Tech Stack
 
-- Giza CLI & SDK
-- Starknet Mainnet
-- yFinance
-- Python pandas
+- **Giza CLI & SDK** : For model training, ONNX conversion, transpilation and deployment.
+- **Starknet Mainnet** : Blockchain platform.
+- **yFinance** : Data source for fetching historical and real-time financial data.
+- **Python pandas** : Data manipulation and analysis library.
 
 ## App Demo Screenshots
 
