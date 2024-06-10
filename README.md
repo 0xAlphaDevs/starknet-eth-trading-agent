@@ -32,11 +32,14 @@ The agent is designed to facilitate trading on the ETH/USDC pool using an AI-dri
 
 ### Functionality
 
-Automated Trading: Executes buy and sell orders in the ETH/USDC pool.
-Prediction Models: Uses trained models to predict optimal trading times and amounts.
-On-Chain Deployment: Deployed on Starknet mainnet, ensuring transparency and immutability.
+- **Prediction Models** : Uses trained models to predict optimal trading times and amounts.
+- **On-Chain Deployment** : Deployed on Starknet mainnet, ensuring transparency and immutability.
 
 ### Attack Vectors
+
+- **Front-running** : Mitigated by using Starknet's high throughput and low latency.
+- **Smart Contract Exploits** : Regular audits and adherence to best practices in smart contract development.
+- **Market Manipulation** : Use of robust models to identify and react to manipulation attempts.
 
 ### Possible Improvements
 
@@ -47,7 +50,7 @@ On-Chain Deployment: Deployed on Starknet mainnet, ensuring transparency and imm
 ## Tech Stack
 
 - **Giza CLI & SDK** : For model training, ONNX conversion, transpilation and deployment.
-- **Starknet Mainnet** : Blockchain platform.
+- **Starknet Mainnet** : Blockchain platform for deploying and executing contracts.
 - **yFinance** : Data source for fetching historical and real-time financial data.
 - **Python pandas** : Data manipulation and analysis library.
 
