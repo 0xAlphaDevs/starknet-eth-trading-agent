@@ -159,7 +159,7 @@ The agent is designed to facilitate trading on the ETH/USDC pool using an AI-dri
 
 - **Model Enhancement** : Continuous training with updated data to improve prediction accuracy.
 - **User Interface** : Development of a user-friendly dashboard for monitoring and control.
-- **Integration with More DEXs** : Expanding support to other decentralized exchanges for diversified trading opportunities.
+- **Integration with DEXs** : Expanding support to decentralized exchanges for diversified trading opportunities.
 
 ## Tech Stack
 
