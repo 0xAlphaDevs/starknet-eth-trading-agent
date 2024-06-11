@@ -13,7 +13,7 @@ On chain ETH trading strategy agent deployed on starknet mainnet | Built using G
 ## Links
 
 - [Demo Video]()
-- [Presentation]()
+- [Presentation](https://www.canva.com/design/DAGHwC7TMhw/ulHDH4d3AvLewKv4wn_pvA/edit?utm_content=DAGHwC7TMhw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## Project Overview
 
@@ -160,12 +160,16 @@ python action_agent.py --model-id <YOUR-MODEL-ID> --version-id <YOUR-VERSION-ID>
 
 ## Demo
 
-![image](/public/demo/1.png)
-![image](/public/demo/2.jpg)
-![image](/public/demo/3.jpg)
-![image](/public/demo/4.jpg)
-![image](/public/demo/5.jpg)
-![image](/public/demo/6.jpg)
+![image](/public/demo/1.jpg)
+
+Giza Agent Deployment
+![image](/public/demo/2.jpeg)
+
+Agent_Execution_USDC_InsufficientBalance
+![image](/public/demo/3.jpeg)
+
+Deployed Giza Model (model-id : 784, version-id:1)
+![image](/public/demo/4.jpeg)
 
 ## Team
 
