@@ -150,23 +150,18 @@ python action_agent.py --model-id <YOUR-MODEL-ID> --version-id <YOUR-VERSION-ID>
 
 The agent is designed to facilitate trading on the ETH/USDC pool using an AI-driven strategy. The goal is to optimize trades based on market conditions, leveraging machine learning models for prediction and decision-making.
 
-### Functionality
-
-- **Prediction Models** : Uses trained models to predict optimal trading times and amounts.
-- **On-Chain Deployment** : Deployed on Starknet mainnet, ensuring transparency and immutability.
-
 ### Possible Improvements
 
-- **Model Enhancement** : Continuous training with updated data to improve prediction accuracy.
-- **User Interface** : Development of a user-friendly dashboard for monitoring and control.
-- **Integration with DEXs** : Expanding support to decentralized exchanges for diversified trading opportunities.
+- **Model Enhancement** : Model training with more historical price data to improve prediction accuracy.
+- **User Interface** : Development of a user-friendly dashboard for monitoring and controlling agent and integrated wallets for trading.
+- **Dex Integrations and custom trading stragegies** : Expanding support to other decentralised exchanges and feature for building custom on-chain trading strategies and deploy them from UI with single click.
 
 ## Tech Stack
 
-- **Giza CLI & SDK** : For model training, ONNX conversion, transpilation and deployment.
+- **Giza CLI & SDK** : For model training, ONNX conversion, cairo transpilation and deployment.
 - **Starknet Mainnet** : Blockchain platform for deploying and executing contracts.
-- **yFinance** : Data source for fetching historical and real-time financial data.
-- **Python pandas** : Data manipulation and analysis library.
+- **PyTorch** : Framework for building deep learning models.
+- **Python Libraries** : Poetry for Python dependencies,Pandas, numpy, yFinance for historical data, scikit-learn for ML tooling.
 
 ## App Demo Screenshots
 
