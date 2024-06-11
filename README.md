@@ -165,11 +165,14 @@ python action_agent.py --model-id <YOUR-MODEL-ID> --version-id <YOUR-VERSION-ID>
 Giza Agent Deployment
 ![image](/public/demo/2.jpeg)
 
-Agent_Execution_USDC_InsufficientBalance
-![image](/public/demo/3.jpeg)
-
 Deployed Giza Model (model-id : 784, version-id:1)
 ![image](/public/demo/4.jpeg)
+
+AI_Agent_Execution : USDC_InsufficientBalance
+![image](/public/demo/3.jpeg)
+
+AI_Agent_Execution : BUY_ETH_WITH_USDC
+![image](/public/demo/5.jpeg)
 
 ## Team
 
