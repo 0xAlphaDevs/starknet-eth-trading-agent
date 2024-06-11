@@ -1,24 +1,42 @@
-## Starknet Eth Trading Agent
+## Starknet ETH Trading Agent
 
 On chain ETH trading strategy agent deployed on starknet mainnet | Built using Giza SDK
 
 ## Table of Contents
 
-1. [All Links](#links)
-2. [Instructions to Run ](#instructions-to-run)
-3. [Project Overview](#project-overview)
-4. [Tech Stack](#tech-stack)
-5. [App Demo](#app-demo-screenshots)
-6. [Team](#team)
+1. [Links](#links)
+2. [Project Overview](#project-overview)
+3. [Project Documentation ](#project-documentation)
+4. [Demo](#demo)
+5. [Team](#team)
 
 ## Links
 
 - [Demo Video]()
 - [Presentation]()
 
-## Instructions to Setup
+## Project Overview
 
-Welcome to this step-by-step tutorial for price prediction to assist in trading using the ETH/USDC pool. In this guide, we will walk through the entire process required to set up, deploy, and maintain an intelligent trading solution using the Giza stack. By the end of this tutorial, you will have a functional system capable of informing your trading decisions based on predictive market analysis.
+### Agent Business Case
+
+The agent is designed to facilitate trading on the ETH/USDC pool using an AI-driven strategy. The goal is to optimize trades based on market conditions, leveraging machine learning models for prediction and decision-making.
+
+### Tech Stack
+
+- **Giza CLI & SDK** : For model training, ONNX conversion, cairo transpilation and deployment.
+- **Starknet Mainnet** : Blockchain platform for deploying and executing contracts.
+- **PyTorch** : Framework for building deep learning models.
+- **Python Libraries** : Poetry for Python dependencies,Pandas, numpy, yFinance for historical data, scikit-learn for ML tooling.
+
+### Possible Improvements
+
+- **Model Enhancement** : Model training with more historical price data to improve prediction accuracy.
+- **User Interface** : Development of a user-friendly dashboard for monitoring and controlling agent and integrated wallets for trading.
+- **Dex Integrations and custom trading stragegies** : Expanding support to other decentralised exchanges and feature for building custom on-chain trading strategies and deploy them from UI with single click.
+
+## Project Documentation
+
+Welcome to this step-by-step tutorial for on-chain price prediction strategy to assist in trading on the ETH/USDC pool. In this guide, we will walk through the entire process required to setup, deploy, and run a AI trading agent using the Giza stack. By the end of this tutorial, you will have a functional system capable of executing trades on-chain based on ML model predictions.
 
 ### 1. Setting up Your Development Environment
 
@@ -41,10 +59,6 @@ pip install -U torch pandas
 
 If you don't have one, create a Giza account [here](https://docs.gizatech.xyz/products/platform/resources/users).
 
-**Funded Wallet**
-
-You will need a funded Ethereum address linked to an Ape account. Follow the creating an account and funding the account parts of the MNIST tutorial to complete these steps.
-
 **Environment Variables**
 
 Create a .env file in the project directory and populate it with the following variables:
@@ -55,18 +69,16 @@ DEV_PASSPHRASE="<YOUR-APE-ACCOUNT-PASSWORD>"
 SEPOLIA_RPC_URL="YOUR-RPC-URL"
 ```
 
-We recommend using private RPCs but if you don't have one, use a public one like https://eth-sepolia.g.alchemy.com/v2/demo.
-
 ### 2. Building the Price Prediction Model
 
 In this project, we are using a simple multi-layer perceptron to predict the next day's prices. After training the model, we need to compile it into the ONNX format, which will be used in the next step to transpile it into Cairo.
 
-**Train the Model** :
+**Training the Model** :
 
 The model will download the ETH/USDC prices, preprocess the data, train a simple neural network with Torch, and save the model in ONNX format.
 
 ```
-Example script: model_training.py.
+Script: model_training.py.
 ```
 
 ### 3. Deploying Inference Endpoint
@@ -123,47 +135,28 @@ giza agents create --endpoint-id <ENDPOINT-ID> --name <AGENT-NAME> --description
 
 ### 5. Fetching and Predicting Prices
 
-- **Fetch Price Data** : Retrieve current price data from the ETH/USDC pool on AVNU.
-- **Predict Prices** : Use the deployed model to predict future prices based on historical data.
+- **Fetch Price Data** : Retrieve current price data for ETH from yFinance for past 60 days.
+- **Predict Prices** : Use the deployed model to predict future prices based on above data.
 
 ### 6. Defining the Execution Flow
 
-Now we will use the giza-actions sdk to develop our AI Agent and adjust the LP position. We need to implement the following steps:
+Now we will use the giza-actions sdk to develop our AI Agent and execute trades on Starknet Mainnet. We need to implement the following steps:
 
-- Fetch all the required addresses
+- Load environment variables
 - Create the AI Agent instance
 - Run verifiable inference
-- Get the prediction value.
-- Buy/Sell ETH/USDC according to the predicted value.
+- Get ETH prediction value.
+- Buy/Sell ETH according to the predicted value.
 
 ### 7. Running the AI Agent
 
 Finally, we can execute our script with the desired parameters:
 
 ```
-python action_agent.py --model-id <YOUR-MODEL-ID> --version-id <YOUR-VERSION-ID> (add input value if there is any)
+python action_agent.py --model-id <YOUR-MODEL-ID> --version-id <YOUR-VERSION-ID>
 ```
 
-## Project Overview
-
-### Agent Business Case
-
-The agent is designed to facilitate trading on the ETH/USDC pool using an AI-driven strategy. The goal is to optimize trades based on market conditions, leveraging machine learning models for prediction and decision-making.
-
-### Possible Improvements
-
-- **Model Enhancement** : Model training with more historical price data to improve prediction accuracy.
-- **User Interface** : Development of a user-friendly dashboard for monitoring and controlling agent and integrated wallets for trading.
-- **Dex Integrations and custom trading stragegies** : Expanding support to other decentralised exchanges and feature for building custom on-chain trading strategies and deploy them from UI with single click.
-
-## Tech Stack
-
-- **Giza CLI & SDK** : For model training, ONNX conversion, cairo transpilation and deployment.
-- **Starknet Mainnet** : Blockchain platform for deploying and executing contracts.
-- **PyTorch** : Framework for building deep learning models.
-- **Python Libraries** : Poetry for Python dependencies,Pandas, numpy, yFinance for historical data, scikit-learn for ML tooling.
-
-## App Demo Screenshots
+## Demo
 
 ![image](/public/appDemo/1.png)
 ![image](/public/appDemo/2.jpg)
