@@ -13,7 +13,7 @@ On chain ETH trading strategy agent deployed on starknet mainnet | Built using G
 ## Links
 
 - [Demo Video]()
-- [Presentation](https://www.canva.com/design/DAGHwC7TMhw/ulHDH4d3AvLewKv4wn_pvA/edit?utm_content=DAGHwC7TMhw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+- [Presentation](https://www.canva.com/design/DAGHwC7TMhw/6qg5BVHZ-SB39NRVz8Dh-Q/view?utm_content=DAGHwC7TMhw&utm_campaign=designshare&utm_medium=link&utm_source=editor)
 
 ## Project Overview
 
