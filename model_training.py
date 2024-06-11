@@ -8,8 +8,8 @@ from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, TensorDataset
 
 # Step 1: Fetch Historical Price Data
-def fetch_data(ticker, start_date, end_date):
-    data = yf.download(ticker, start=start_date, end=end_date)
+def fetch_data(ticker, start_date):
+    data = yf.download(ticker, start=start_date)
     return data['Close'].values.reshape(-1, 1)
 
 # Step 2: Preprocess Data
@@ -62,32 +62,33 @@ def predict_next_price(model, data, window_size, scaler):
     
     with torch.no_grad():
         predicted_price_scaled = model(last_window_scaled)
+        print(predicted_price_scaled)
     
     predicted_price = scaler.inverse_transform(predicted_price_scaled.numpy().reshape(-1, 1))
     return predicted_price[0, 0]
 
 # Step 6: Convert Model to ONNX
-def convert_to_onnx(model, input_size, onnx_file_path):
+def serialize_to_onnx(model, input_size, onnx_file_path):
     model.eval()
     dummy_input = torch.randn(1, input_size)
     torch.onnx.export(model, dummy_input, onnx_file_path,
                       input_names=['input'], output_names=['output'],
                       dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}})
-    print(f"Model has been converted to ONNX and saved at {onnx_file_path}")
+    print(f"✅ Model has been converted to ONNX and saved at {onnx_file_path} ")
 
 # Main execution
 if __name__ == "__main__":
     # Parameters
     ticker = "ETH-USD"
-    start_date = "2024-01-01"
-    end_date = "2024-06-09"
+    start_date = "2020-01-01"
     window_size = 60
     batch_size = 32
     epochs = 50
-    onnx_file_path = "price_predictor.onnx"
+    onnx_file_path = "torch_eth_price_predictor.onnx"
     
     # Fetch and preprocess data
-    data = fetch_data(ticker, start_date, end_date)
+    print("Fetching and preprocessing data...")
+    data = fetch_data(ticker, start_date)
     X, y, scaler = preprocess_data(data, window_size)
     
     # Convert to PyTorch tensors
@@ -95,10 +96,12 @@ if __name__ == "__main__":
     y_tensor = torch.tensor(y, dtype=torch.float32).view(-1, 1)
     
     # Create DataLoader
+    print("Creating DataLoader...")
     dataset = TensorDataset(X_tensor, y_tensor)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     
     # Build and train model
+    print("Building and training model...")
     model = PricePredictor(X_tensor.shape[1])
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -106,8 +109,11 @@ if __name__ == "__main__":
     train_model(model, dataloader, criterion, optimizer, epochs=epochs)
     
     # Predict the next price
+    print("Predicting the next price...")
     next_price = predict_next_price(model, data, window_size, scaler)
     print(f"Predicted next price of ETH/USDC: {next_price}")
     
     # Convert model to ONNX
-    convert_to_onnx(model, X_tensor.shape[1], onnx_file_path)
+    print("Converting model to ONNX format...")
+    serialize_to_onnx(model, X_tensor.shape[1], onnx_file_path)
+

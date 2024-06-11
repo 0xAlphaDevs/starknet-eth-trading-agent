@@ -1,3 +1,6 @@
 .env
 test.py
 test2.py
+torch_eth_price_predictor.onnx
+__pycache__
+tmp
