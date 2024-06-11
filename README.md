@@ -65,8 +65,10 @@ Create a .env file in the project directory and populate it with the following v
 env
 
 ```
-DEV_PASSPHRASE="<YOUR-APE-ACCOUNT-PASSWORD>"
-SEPOLIA_RPC_URL="YOUR-RPC-URL"
+PRIVATE_KEY=
+PUBLIC_KEY=
+DRY_RUN=true # Set as true when testing Giza models locally
+STARKNET_RPC_URL=https://free-rpc.nethermind.io/mainnet-juno
 ```
 
 ### 2. Building the Price Prediction Model
