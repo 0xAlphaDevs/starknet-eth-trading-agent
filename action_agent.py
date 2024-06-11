@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import pprint
+import asyncio
 from logging import getLogger
 from datetime import date, timedelta
 
@@ -17,14 +18,14 @@ from starknet_py.net.models import StarknetChainId
 from starknet_py.net.account.account import Account
 from starknet_py.net.full_node_client import FullNodeClient
 from starknet_py.net.signer.stark_curve_signer import KeyPair
-from avnu_helpers import approve, swap_eth_to_usdc, get_balance, check_allowance, swap_usdc_to_eth
+from avnu_helpers import swap_eth_to_usdc, get_balance, swap_usdc_to_eth
 
 load_dotenv(find_dotenv())
 
 dev_private_key = os.environ.get("PRIVATE_KEY")
 dev_public_key = os.environ.get("PUBLIC_KEY")
-starknet_rpc_url = os.environ.get("STARKNET_RPC_URL")
 dry_run = os.environ.get("DRY_RUN")
+starknet_rpc_url = os.environ.get("STARKNET_RPC_URL")
 
 logging.basicConfig(level=logging.INFO)
 
@@ -45,6 +46,7 @@ def preprocess_data(data, window_size):
     last_window_scaled = np.array(last_window_scaled).reshape(1, -1)
     return last_window_scaled, scaler
 
+# Create Giza Model and Starknet Account instances
 def create_model_and_account(
     model_id: int, version_id: int
 ):
@@ -53,7 +55,7 @@ def create_model_and_account(
     """
 
     # we create an instance of our Account
-    node_url = "https://free-rpc.nethermind.io/mainnet-juno"
+    node_url = starknet_rpc_url
     client = FullNodeClient(node_url=node_url)
 
     account = Account(
@@ -69,12 +71,13 @@ def create_model_and_account(
     )
     return model, account
 
+# Make predictions
 def predict(model: GizaModel, last_window_scaled: np.ndarray, scaler: MinMaxScaler):
     """
     Predict the ETH price.
 
     Args:
-        X (np.ndarray): Input to the model.
+    last_window_scaled (np.ndarray): Input to the model.
 
     Returns:
         float: Predicted ETH price.
@@ -91,15 +94,16 @@ def predict(model: GizaModel, last_window_scaled: np.ndarray, scaler: MinMaxScal
 
     return eth_price_prediction, request_id
 
-def execute_trading_strategy(model_id: int, version_id: int):
+async def execute_trading_strategy(model_id: int, version_id: int):
     """
     Execute the trading strategy based on the prediction.
     """
     logger = getLogger("agent_logger")
-    nft_manager_address = ADDRESSES["NonfungiblePositionManager"][11155111]
-    
-    logger.info("Starting the trading strategy")
+    eth_token_address = ADDRESSES["ETH"]["SN_MAIN"]
+    usdc_token_address = ADDRESSES["USDC"]["SN_MAIN"]
+    avnu_exchange = ADDRESSES["AVNU_EXCHANGE"]["SN_MAIN"]
 
+    logger.info("Starting the trading strategy")
     # Parameters
     ticker = "ETH-USD"
     start_date = (date.today() - timedelta(days=60)).strftime("%Y-%m-%d")
@@ -126,17 +130,31 @@ def execute_trading_strategy(model_id: int, version_id: int):
 
     # if the predicted price is more than 1% higher than the current price, buy
     if eth_price_prediction > current_eth_price * 1.01:
-        logger.info("Buying ETH")
         # get usdc balance , if > 0.2 , buy ETH with 0.1 USDC
-        # account.buy_eth(eth_price_prediction, 0.1)
+        usdc_balance = await get_balance(account, usdc_token_address) 
+        usdc_balance = usdc_balance / 10**6   
+        logger.info(f"Your USDC balance: {usdc_balance:.2f}")
+        if usdc_balance > 0.2:
+            logger.info("Buying ETH with 0.1 USDC....")
+            tx_hash = await swap_usdc_to_eth(account, 0.1)
+            logger.info(f"Transaction hash: {tx_hash}")
+        else:
+            logger.info("Insufficient USDC balance to buy ETH")
+        
     elif eth_price_prediction < current_eth_price * 0.99:
-        logger.info("Selling ETH")
-        # get ETH balance ,sell all ETH for USDC
-        # account.sell_eth(eth_price_prediction, 0.1)
+        eth_balance = await get_balance(account, eth_token_address)
+        eth_balance = eth_balance / 10**18
+        logger.info(f"ETH balance: {eth_balance:.18f}")
+        if eth_balance > 0:
+            logger.info("Selling ETH for USDC....")
+            tx_hash = await swap_eth_to_usdc(account, eth_balance)
+            logger.info(f"Transaction hash: {tx_hash}")
+        else:
+            logger.info("No ETH balance to sell")
     else:
         logger.info("No trading action needed at this time.")
    
-    logger.info("Finished")
+    logger.info("-------Agent Execution Finished---------")
 
 if __name__ == "__main__":
     # Create the parser
@@ -152,4 +170,4 @@ if __name__ == "__main__":
     MODEL_ID = args.model_id
     VERSION_ID = args.version_id
 
-    execute_trading_strategy( MODEL_ID, VERSION_ID)
+    asyncio.run(execute_trading_strategy( MODEL_ID, VERSION_ID))

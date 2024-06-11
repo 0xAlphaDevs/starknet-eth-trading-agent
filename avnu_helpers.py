@@ -1,124 +1,149 @@
+
+import requests
+import os
 from starknet_py.net.models import StarknetChainId
 from starknet_py.net.account.account import Account
 from starknet_py.net.full_node_client import FullNodeClient
 from starknet_py.contract import Contract
+from starknet_py.hash.selector import get_selector_from_name
+from starknet_py.net.client_models import Call
 
-def check_allowance(
-    account: Account, spender: str, token_address: str
+from addresses import ADDRESSES
+from dotenv import find_dotenv, load_dotenv
+from typing import List, Dict,Iterable
+
+load_dotenv(find_dotenv())
+
+taker_address = os.environ.get("PUBLIC_KEY")
+
+# AVNU V3 API - STARKNET MAINNET
+
+def get_quote(
+    sell_token: str, buy_token: str, amount: float
 ):
     """
-    Check the allowance of a spender.
+    Get a quote for a swap.
     """
-    # we create an instance of our Account
-    node_url = "https://free-rpc.nethermind.io/mainnet-juno"
-    client = FullNodeClient(node_url=node_url)
+    # we get the addresses of the tokens
+    sell_token_address = ADDRESSES[sell_token]["SN_MAIN"]
+    buy_token_address = ADDRESSES[buy_token]["SN_MAIN"]
 
-    # we create an instance of our Starknet contract
-    # contract = StarknetContract(
-    #     address=token_address,
-    #     abi=abi,
-    #     client=client,
-    # )
+    if sell_token == "ETH":
+        sell_amount = hex(int(amount * 10 ** 18)) # 18 decimals for ETH
+    elif buy_token == "ETH":
+        sell_amount = hex(int(amount * 10 ** 6)) # 6 decimals for USDC
 
-    # # we call the check_allowance function
-    # allowance = contract.check_allowance(
-    #     account=account,
-    #     spender=spender,
-    # )
-    # return allowance
+    # call AVNU V3 api to get quote - GET https://starknet.api.avnu.fi/swap/v2/quotes?
+    url = f"https://starknet.api.avnu.fi/swap/v2/quotes?sellTokenAddress={sell_token_address}&buyTokenAddress={buy_token_address}&sellAmount={sell_amount}&size=1"
 
-def approve(
-    account: Account, spender: str, token_address: str, amount: int
+    response = requests.get(url)
+    quote = response.json()
+    return quote[0]
+
+def build_swap_calldata(
+    quote_id: str, taker_address: str,slippage: float,include_approve: bool
 ):
     """
-    Approve a spender.
+    Build the calldata for a swap.
     """
-    # we create an instance of our Account
-    node_url = "https://free-rpc.nethermind.io/mainnet-juno"
-    client = FullNodeClient(node_url=node_url)
 
-    # we create an instance of our Starknet contract
-    # contract = StarknetContract(
-    #     address=token_address,
-    #     abi=abi,
-    #     client=client,
-    # )
+    # call AVNU V3 api to build swap calldata - POST https://starknet.api.avnu.fi/swap/v2/build with request body
+    url = f"https://starknet.api.avnu.fi/swap/v2/build"
 
-    # # we call the approve function
-    # contract.approve(
-    #     account=account,
-    #     spender=spender,
-    #     amount=amount,
-    # )
-    # return contract
+    data = {
+        "quoteId": quote_id,
+        "takerAddress": taker_address,
+        "slippage": slippage,
+        "includeApprove": include_approve
+    }
 
-def get_balance(
+    response = requests.post(url, json=data)
+    calldata = response.json()
+    return calldata
+
+# Starknet Blockchain Read/Write Functions
+
+async def execute_transactions(
+    calls: list, account: Account):
+    """
+    Execute transactions using Calls.
+    """
+    # prepare the calls
+    all_calls = []
+    for call in calls:
+        prepared_call = Call(
+            to_addr=call["to_addr"],
+            selector=call["selector"],
+            calldata=call["calldata"],
+        )
+        all_calls.append(prepared_call)
+
+    # execute the calls
+    resp = await account.execute_v3(calls=all_calls,auto_estimate=True)
+
+    await account.client.wait_for_tx(resp.transaction_hash)
+
+    return resp.transaction_hash
+
+async def get_balance(
     account: Account, token_address: str
 ):
     """
     Get the balance of an account.
     """
-    # we create an instance of our Account
-    node_url = "https://free-rpc.nethermind.io/mainnet-juno"
-    client = FullNodeClient(node_url=node_url)
-
-    # we create an instance of our Starknet contract
-    # contract = StarknetContract(
-    #     address=token_address,
-    #     abi=abi,
-    #     client=client,
-    # )
-
-    # # we call the get_balance function
-    # balance = contract.get_balance(
-    #     account=account,
-    # )
-    # return balance
-
-def swap_eth_to_usdc(
+    balance = await account.get_balance(token_address)
+    return balance
+    
+async def swap_eth_to_usdc(
     account: Account, amount: int
 ):
     """
     Swap ETH to USDC.
     """
-    # we create an instance of our Account
-    node_url = "https://free-rpc.nethermind.io/mainnet-juno"
-    client = FullNodeClient(node_url=node_url)
+    try:
+        quote = get_quote("ETH", "USDC", amount)
+        # print(f"Quote: {quote}")
+        calldata = build_swap_calldata(quote["quoteId"], taker_address, 0.05, True)
+        # print(f"Calldata: {calldata}")
+        calls = convert_to_call(calldata["calls"])
+        # print(f"Calls: {calls}")
+        tx_hash = await execute_transactions(calls, account)
+        # print(f"Transaction hash: {hex(tx_hash)}")
+        return hex(tx_hash)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
-    # we create an instance of our Starknet contract
-    # contract = StarknetContract(
-    #     address=contract_address,
-    #     abi=abi,
-    #     client=client,
-    # )
-
-    # # we call the swap function
-    # contract.multi_route_swap_function(
-    #     account=account,
-    #     amount=amount,
-    # )
-    # return contract
-
-def swap_usdc_to_eth(
-    account: Account, amount: int
+async def swap_usdc_to_eth(
+    account: Account, amount: float
 ):
     """
     Swap USDC to ETH.
     """
-    # we create an instance of our Account
-    node_url = "https://free-rpc.nethermind.io/mainnet-juno"
-    client = FullNodeClient(node_url=node_url)
+    try:
+        quote = get_quote("USDC", "ETH", amount)
+        # print(f"Quote: {quote}")
+        calldata = build_swap_calldata(quote["quoteId"], taker_address, 0.05, True)
+        # print(f"Calldata: {calldata}")
+        calls = convert_to_call(calldata["calls"])
+        # print(f"Calls: {calls}")
+        tx_hash = await execute_transactions(calls, account)
+        # print(f"Transaction hash: {hex(tx_hash)}")
+        return hex(tx_hash)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    
+# Helper Functions
 
-    # we create an instance of our Starknet contract
-    # contract = StarknetContract(
-    #     address=contract_address,
-    #     abi=abi,
-    #     client=client,
-    # )
+def hex_to_int(hex_str):
+    """Convert a hex string to an integer."""
+    return int(hex_str, 16)
 
-    # # we call the swap function
-    # contract.multi_route_swap_function(
-    #     account=account,
-    #     amount=amount,
-    # )
-    # return contract
+def convert_to_call(data):
+    """Convert input data to a list of Call dataclass instances."""
+    calls = []
+    for item in data:
+        to_addr = hex_to_int(item["contractAddress"])
+        selector = get_selector_from_name(item["entrypoint"])  
+        calldata = [hex_to_int(arg) for arg in item["calldata"]]
+        calls.append({"to_addr" :to_addr, "selector":selector, "calldata":calldata})
+    return calls

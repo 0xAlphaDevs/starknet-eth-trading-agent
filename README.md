@@ -158,12 +158,12 @@ python action_agent.py --model-id <YOUR-MODEL-ID> --version-id <YOUR-VERSION-ID>
 
 ## Demo
 
-![image](/public/appDemo/1.png)
-![image](/public/appDemo/2.jpg)
-![image](/public/appDemo/3.jpg)
-![image](/public/appDemo/4.jpg)
-![image](/public/appDemo/5.jpg)
-![image](/public/appDemo/6.jpg)
+![image](/public/demo/1.png)
+![image](/public/demo/2.jpg)
+![image](/public/demo/3.jpg)
+![image](/public/demo/4.jpg)
+![image](/public/demo/5.jpg)
+![image](/public/demo/6.jpg)
 
 ## Team
 
